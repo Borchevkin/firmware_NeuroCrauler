@@ -24,7 +24,7 @@ int free_Ram();
 #define TIMECTL_MAXTICKS  4294967295L
 #define TIMECTL_INIT      0
 
-bool is_Time(unsigned long &timeMark, unsigned long timeInterval);
+bool is_time(unsigned long &timeMark, unsigned long timeInterval);
 
 // считывание значения с простым устранением "дребезга контактов"
 int debounce_digitalRead(uint8_t pin);

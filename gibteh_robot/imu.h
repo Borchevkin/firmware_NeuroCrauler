@@ -726,8 +726,6 @@ void reset_sensor_fusion() {
   init_rotation_matrix(DCM_Matrix, yaw, pitch, roll);
 }
 
-extern unsigned long imu_time;
-
 bool get_imu_angles()
 {
     // Time to read the sensors again?

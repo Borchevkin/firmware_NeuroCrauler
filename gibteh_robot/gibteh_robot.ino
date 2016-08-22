@@ -7,19 +7,37 @@
 /*
 железо робота:
 
-Bluetooth Bee DFRobot v2
+* Arduino UNO
+    http://robocraft.ru/shop/index.php?route=product/product&product_id=145
+
+* IO Expansion Shield for Arduino V7.1
+    http://www.dfrobot.com/wiki/index.php/IO_Expansion_Shield_for_Arduino_V7_SKU:DFR0265
+    http://www.robototehnika.ru/e-store/catalog/201/811/
+
+* Bluetooth Bee DFRobot v2
+    http://www.dfrobot.com/wiki/index.php?title=BLUETOOH_BEE_(SKU:TEL0023)
     http://www.robototehnika.ru/e-store/catalog/248/1058/
 
 Baud rate default: 9600
 Pair: 1234
 
-IMU
+* модуль IMU GY-85
 IMU (Inertial measurement unit - Инерционное измерительное устройство) модуль - позволяет определить положение в пространстве.
 В составе :
 3х осевой цифровой гироскоп ITG3205
 3х осевой цифровой акселерометр ADXL345
 3х осевой цифровой магнитометр HMC5883L
 http://robocraft.ru/shop/index.php?route=product/product&path=45&product_id=265
+
+* Сервомашинки SERVO SG-5010
+    http://robocraft.ru/shop/index.php?route=product/product&path=18&product_id=59
+
+* Понижающий DC-DC преобразователь 2A (рег.) - для питания сервомашинок (настроен на 5В)
+    http://robocraft.ru/shop/index.php?route=product/product&path=54&product_id=251
+
+* батарейный отсек на 6 элементов AA
+
+* концевой выключатель - TIAIHUA 1A 125V AC - Shaped Lever 3 Pin Momentary SPDT Mini Micro Switch Normally Open Close
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -40,13 +58,15 @@ http://robocraft.ru/shop/index.php?route=product/product&path=45&product_id=265
 
 двухбайтовые значения в формате little-endian (LSB, MSB)
 
-
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 используемые библиотеки:
 
+ультразвуковой сонар:
 http://playground.arduino.cc/Code/NewPing
     https://bitbucket.org/teckel12/arduino-new-ping/downloads/NewPing_v1.8.zip
 
+IMU:
 Файлы проекта Razor AHRS ( v1.4.1 - Arduino+Processing+Matlab)
 https://dev.qu.tu-berlin.de/login?back_url=https%3A%2F%2Fdev.qu.tu-berlin.de%2Fprojects%2Fsf-razor-9dof-ahrs%2Fwiki%2FTutorial
 http://robocraft.ru/files/sensors/IMU/Razor%20AHRS%20Firmware%20and%20Test%20Sketch%20v1.4.1.zip
@@ -54,9 +74,8 @@ http://robocraft.ru/files/sensors/IMU/Razor%20AHRS%20Firmware%20and%20Test%20Ske
 В секции "HARDWARE OPTIONS" раскомментировать сторку
 #define HW__VERSION_CODE 10724 // SparkFun "9DOF Sensor Stick" version "SEN-10724" (HMC5883L magnetometer)
 
-http://robocraft.ru/files/sensors/IMU/IMU.ino
 Пример скетча (минималистичная версия на базе Razor AHRS - убрана вся фильтрация, математика, совместимость с другими модулями и т.п.  - просто ROW с датчиков в Serial)
-
+http://robocraft.ru/files/sensors/IMU/IMU.ino
 */
 
 #include <stdint.h>
@@ -66,12 +85,6 @@ http://robocraft.ru/files/sensors/IMU/IMU.ino
 #include <Wire.h>
 #include <NewPing.h> //#include <Ultrasonic.h>
 #include "imu.h"
-
-NewPing ultrasonic(ULTRASONIC_TRIG_PIN, ULTRASONIC_ECHO_PIN, ULTRASONIC_MAX_DISTANCE_CM);
-
-unsigned long imu_time = 0;
-unsigned long blink_time = 0;
-byte blink_val = 0;
 
 #pragma pack(push, 1)
 typedef struct RobotData {
@@ -105,7 +118,12 @@ typedef struct RobotLeg {
         servo[0].attach(SERVO1_PIN);
         servo[1].attach(SERVO2_PIN);
 
+#if defined(INPUT_PULLUP)
+        pinMode(END_SENSOR_PIN, INPUT_PULLUP);
+#else
         pinMode(END_SENSOR_PIN, INPUT);
+        digitalWrite(END_SENSOR_PIN, HIGH);  // turn on internal pull-up
+#endif
     }
 
     void move(int16_t servo1_pos, int16_t servo2_pos) {
@@ -120,6 +138,11 @@ typedef struct RobotLeg {
 } RobotLeg;
 
 RobotLeg robot_leg;
+
+NewPing ultrasonic(ULTRASONIC_TRIG_PIN, ULTRASONIC_ECHO_PIN, ULTRASONIC_MAX_DISTANCE_CM);
+
+unsigned long blink_time = 0;
+byte blink_val = 0;
 
 void setup()
 {
@@ -148,7 +171,7 @@ void loop()
         update_angle();
     }
 
-    if(is_Time(blink_time, 1000)) {
+    if(is_time(blink_time, 1000)) {
         digitalWrite(LED_PIN, !blink_val);
         blink_val = !blink_val;
     }
@@ -183,7 +206,7 @@ void process_serial_commands()
             }
         }
 
-        if(buffer_size == sizeof(pc_command)) {
+        if(buffer_size >= sizeof(pc_command)) {
             mode_ = MODE_PCKT_START1;
             buffer_size = 0;
 

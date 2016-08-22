@@ -1,5 +1,9 @@
-#include <Wire.h>
+//
+// Пример скетча (минималистичная версия на базе Razor AHRS - убрана вся фильтрация, математика, совместимость с другими модулями и т.п.  - просто ROW с датчиков в Serial)
+// http://robocraft.ru/files/sensors/IMU/IMU.ino
+//
 
+#include <Wire.h>
 
 #define OUTPUT__BAUD_RATE 57600
 

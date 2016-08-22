@@ -26,7 +26,7 @@ int free_Ram ()
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
-bool is_Time(unsigned long &timeMark, unsigned long timeInterval)
+bool is_time(unsigned long &timeMark, unsigned long timeInterval)
 {
     unsigned long timeCurrent;
     unsigned long timeElapsed;

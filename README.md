@@ -2,21 +2,21 @@
 
 ## Overview
 
-This project purposed to implement fimware for NeuroCrauler robot used on master class on [Hybrid Technologies Forum](http://гибтехбфу.рф)
+This project purposed to implement firmware for NeuroCrauler robot used on master class on [Hybrid Technologies Forum](http://гибтехбфу.рф)
 
 ## Structure of the repo
 
 * ***/libs/*** - libraries for project
 
-* ***/test/*** - test project for Windows (C++ Qt) implemeted test connection via Bluetooth SPP 
+* ***/test/*** - test project for Windows (C++ under Qt Creator) implemented test connection via Bluetooth SPP 
 
-* ***/build-test/*** - debug build of the test project
+* ***/gibteh_robot/definitions.h*** - header with definitions
 
-* ***/definitions.h*** - header for Razor AHRS
+* ***/gibteh_robot/utils*** - library with aux functions
 
-* ***/utils*** - library with aux functions
+* ***/gibteh_robot/imu.h*** - IMU working - header with Razor AHRS functions
 
-* ***/gibteh_robot.ino*** - Arduino scetch for robot
+* ***/gibteh_robot/gibteh_robot.ino*** - Arduino scetch for robot
 
 ## Errata
 

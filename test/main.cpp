@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
     printf("[i] Start...\n");
 
 #if defined(WIN32)
-    char _port[]="COM25";
+    char _port[]="COM14";
 #endif
     int _rate = 9600;
 
